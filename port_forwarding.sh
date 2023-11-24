@@ -125,6 +125,7 @@ Payload   ${green}$payload${nc}
 --> The port is ${green}$port${nc} and it will expire on ${red}$expires_at${nc}. <--
 
 Trying to bind the port... "
+printf $port > /tmp/pia.port
 
 # Now we have all required data to create a request to bind the port.
 # We will repeat this request every 15 minutes, in order to keep the port
