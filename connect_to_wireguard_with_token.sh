@@ -153,6 +153,7 @@ echo -n "Trying to write ${PIA_CONF_PATH}..."
 mkdir -p "$(dirname "$PIA_CONF_PATH")"
 echo "
 [Interface]
+Table = off
 Address = $(echo "$wireguard_json" | jq -r '.peer_ip')
 PrivateKey = $privKey
 $dnsSettingForVPN
