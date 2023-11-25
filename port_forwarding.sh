@@ -88,6 +88,7 @@ if [[ -z $PAYLOAD_AND_SIGNATURE ]]; then
     --connect-to "$PF_HOSTNAME::$PF_GATEWAY:" \
     --cacert "ca.rsa.4096.crt" \
     -G --data-urlencode "token=${PIA_TOKEN}" \
+	--interface pia \
     "https://${PF_HOSTNAME}:19999/getSignature")"
 else
   payload_and_signature=$PAYLOAD_AND_SIGNATURE
@@ -137,6 +138,7 @@ while true; do
     --cacert "ca.rsa.4096.crt" \
     --data-urlencode "payload=${payload}" \
     --data-urlencode "signature=${signature}" \
+	--interface pia \
     "https://${PF_HOSTNAME}:19999/bindPort")"
     echo -e "${green}OK!${nc}"
 
