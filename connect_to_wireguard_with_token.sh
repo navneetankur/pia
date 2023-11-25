@@ -151,10 +151,11 @@ if [[ $PIA_DNS == "true" ]]; then
 fi
 echo -n "Trying to write ${PIA_CONF_PATH}..."
 mkdir -p "$(dirname "$PIA_CONF_PATH")"
+ipaddress=$(echo "$wireguard_json" | jq -r '.peer_ip')
 echo "
 [Interface]
 Table = off
-Address = $(echo "$wireguard_json" | jq -r '.peer_ip')
+Address = $ipaddress
 PrivateKey = $privKey
 $dnsSettingForVPN
 [Peer]
@@ -174,6 +175,13 @@ if [[ $PIA_CONNECT == "true" ]]; then
   echo
   echo "Trying to create the wireguard interface..."
   wg-quick up pia || exit 1
+
+	ip route add default dev pia table 1003
+	ip rule delete from all oif pia
+	ip rule delete from "$ipaddress"
+	ip rule add oif pia table 1003
+	ip rule add from "$ipaddress" table 1003
+
   echo
   echo -e "${green}The WireGuard interface got created.${nc}
 
@@ -194,6 +202,12 @@ if [[ $PIA_CONNECT == "true" ]]; then
     echo
     echo "The location used must be port forwarding enabled, or this will fail."
     echo "Calling the ./get_region script with PIA_PF=true will provide a filtered list."
+	echo "#!/bin/bash" > /tmp/pia_fwd.sh
+	echo "cd /writable/opt/pia/manual-connections/" >> /tmp/pia_fwd.sh
+    echo -e "$ ${green}PIA_TOKEN=$PIA_TOKEN" \
+      "PF_GATEWAY=$WG_SERVER_IP" \
+      "PF_HOSTNAME=$WG_HOSTNAME" \
+      "./port_forwarding.sh${nc}" >> /tmp/pia_fwd.sh
     exit 1
   fi
 
